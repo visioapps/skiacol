@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Posologie Skiacol</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; overflow:hidden; -webkit-tap-highlight-color:transparent; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#e8eef5; display:flex; flex-direction:column; height:100%; }
+
+    .header { background:white; padding:8px 16px; box-shadow:0 2px 8px rgba(0,0,0,0.04); text-align:center; flex-shrink:0; }
+    .header h1 { color:#2c5282; font-size:16px; font-weight:600; }
+
+    .slide-container { flex:1; position:relative; overflow:hidden; min-height:0; }
+    .slide-track { display:flex; width:200%; height:100%; transition:transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+    .slide-page { width:50%; height:100%; display:flex; flex-direction:column; }
+
+    .patient-container { flex:1; display:flex; flex-direction:column; max-width:500px; margin:0 auto; width:100%; padding:12px 16px 8px; gap:10px; min-height:0; overflow-y:auto; }
+    
+    .drops-card { background:white; border-radius:12px; padding:16px 18px; box-shadow:0 3px 12px rgba(0,0,0,0.05); }
+    .drops-card-title { font-size:10px; font-weight:600; color:#718096; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:14px; }
+    .drop-time { display:flex; align-items:center; padding:12px 0; border-bottom:1px solid #f7fafc; }
+    .drop-time:last-child { border-bottom:none; padding-bottom:0; }
+    .drop-info { flex:1; }
+    .drop-hour { font-size:24px; font-weight:700; color:#2c5282; line-height:1; margin-bottom:4px; }
+    .drop-instruction { font-size:12px; color:#718096; line-height:1.3; }
+
+    .exam-card { background:#5dade2; border-radius:12px; padding:20px; box-shadow:0 4px 16px rgba(93,173,226,0.2); text-align:center; }
+    .exam-label { font-size:10px; font-weight:600; color:rgba(255,255,255,0.85); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; }
+    .exam-time { font-size:42px; font-weight:700; color:white; line-height:1; margin-bottom:8px; }
+    .exam-with { font-size:13px; color:rgba(255,255,255,0.95); font-weight:500; }
+
+    .info-card { background:#fef3c7; border-radius:12px; padding:14px 18px; box-shadow:0 3px 10px rgba(251,191,36,0.12); }
+    .info-card-title { font-size:10px; font-weight:700; color:#92400e; margin-bottom:7px; text-transform:uppercase; letter-spacing:0.4px; }
+    .info-card-text { font-size:12px; color:#78350f; line-height:1.5; }
+
+    .config-container { flex:1; display:flex; flex-direction:column; max-width:500px; margin:0 auto; width:100%; padding:12px 16px 8px; gap:0; min-height:0; overflow-y:auto; }
+    
+    .choice-section { background:white; border-radius:10px; padding:8px 12px; box-shadow:0 1px 3px rgba(0,0,0,0.02); margin-bottom:6px; }
+    .choice-title { font-size:10px; font-weight:600; color:#a0aec0; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.3px; }
+    .choice-buttons { display:flex; gap:6px; }
+    .choice-btn { flex:1; padding:8px; border:1.5px solid #e2e8f0; background:white; color:#718096; border-radius:6px; font-size:13px; font-weight:500; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; justify-content:center; gap:4px; }
+    .choice-btn:active { transform:scale(0.96); }
+    .choice-btn.active { background:#5dade2; color:white; border-color:#5dade2; box-shadow:0 2px 6px rgba(93,173,226,0.15); }
+
+    .time-picker { display:flex; gap:6px; margin-top:6px; }
+    .time-input { flex:1; padding:8px; border:1.5px solid #e2e8f0; border-radius:6px; font-size:14px; font-weight:600; color:#2c5282; text-align:center; transition:all 0.3s; background:white; }
+    .time-input:focus { outline:none; border-color:#5dade2; box-shadow:0 0 0 2px rgba(93,173,226,0.1); }
+    .time-input:disabled { background:#f7fafc; color:#cbd5e0; border-color:#e2e8f0; }
+
+    .ortho-section { background:white; border-radius:10px; padding:8px 12px; box-shadow:0 1px 3px rgba(0,0,0,0.02); display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; transition:all 0.3s; margin-bottom:10px; }
+    .ortho-section:active { transform:scale(0.98); }
+    .ortho-checkbox { width:18px; height:18px; border:1.5px solid #cbd5e0; border-radius:4px; display:flex; align-items:center; justify-content:center; transition:all 0.3s; flex-shrink:0; }
+    .ortho-section.checked .ortho-checkbox { background:#5dade2; border-color:#5dade2; }
+    .ortho-checkbox::after { content:'✓'; color:white; font-size:11px; font-weight:bold; opacity:0; transition:opacity 0.3s; }
+    .ortho-section.checked .ortho-checkbox::after { opacity:1; }
+    .ortho-label { font-size:12px; color:#718096; font-weight:500; line-height:1.3; }
+
+    .bottom-buttons { display:flex; gap:8px; padding:0 16px 12px; }
+    .bottom-btn { flex:1; padding:11px; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.3s; }
+    .bottom-btn:active { transform:scale(0.96); }
+    .copy-btn { background:#5dade2; color:white; box-shadow:0 3px 10px rgba(93,173,226,0.18); }
+    .reset-btn { background:#f5a1a1; color:white; box-shadow:0 3px 10px rgba(245,161,161,0.18); }
+    .settings-btn { background:#cbd5e0; color:#4a5568; box-shadow:0 3px 10px rgba(203,213,224,0.18); }
+    .back-btn { background:#cbd5e0; color:#4a5568; box-shadow:0 3px 10px rgba(203,213,224,0.18); }
+
+    .copy-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#5dade2; color:white; padding:16px 24px; border-radius:12px; font-size:15px; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,0.15); z-index:1000; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .copy-modal.show { opacity:1; }
+  </style>
+</head>
+<body>
+  <div class="header"><h1>Posologie Skiacol</h1></div>
+  
+  <div class="slide-container">
+    <div class="slide-track" id="slideTrack">
+      
+      <div class="slide-page">
+        <div class="patient-container">
+          <div class="drops-card">
+            <div class="drops-card-title">Horaires d'instillation</div>
+            <div id="dropsTimeline"></div>
+          </div>
+          <div class="exam-card">
+            <div class="exam-label">Rendez-vous</div>
+            <div class="exam-time" id="examTime">9:15</div>
+            <div class="exam-with">Examen avec votre ophtalmologue</div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-title">À savoir</div>
+            <div class="info-card-text">Vous pouvez patienter en salle d'attente ou faire un tour. Le soleil peut être éblouissant et la vision de près floue pendant quelques heures : c'est normal.</div>
+          </div>
+        </div>
+        <div class="bottom-buttons">
+          <button class="copy-btn bottom-btn" id="copyBtn">Copier</button>
+          <button class="reset-btn bottom-btn" id="resetBtn">Réinitialiser</button>
+          <button class="settings-btn bottom-btn" id="settingsBtn">Réglages</button>
+        </div>
+      </div>
+
+      <div class="slide-page">
+        <div class="config-container">
+          <div class="choice-section">
+            <div class="choice-title">Protocole</div>
+            <div class="choice-buttons">
+              <button class="choice-btn" data-drops="2">💧💧</button>
+              <button class="choice-btn active" data-drops="3">💧💧💧</button>
+            </div>
+          </div>
+          <div class="choice-section">
+            <div class="choice-title">Heure de la 1ère goutte</div>
+            <div class="choice-buttons">
+              <button class="choice-btn active" id="nowBtn">Maintenant</button>
+              <button class="choice-btn" id="customBtn">Choisir</button>
+            </div>
+            <div class="time-picker">
+              <input type="time" class="time-input" id="timeInput" disabled>
+            </div>
+          </div>
+          <div class="ortho-section checked" id="orthoCheck">
+            <div class="ortho-checkbox"></div>
+            <div class="ortho-label">1ère goutte mise par l'orthoptiste</div>
+          </div>
+        </div>
+        <div class="bottom-buttons">
+          <button class="back-btn bottom-btn" id="backBtn">← Retour</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="copy-modal" id="copyModal">✓ Copié !</div>
+
+  <script>
+  (function(){
+    let selectedDrops=3,orthoChecked=true,useNow=true,currentPage=0;
+    const choiceBtns=document.querySelectorAll('.choice-btn[data-drops]'),nowBtn=document.getElementById('nowBtn'),customBtn=document.getElementById('customBtn'),timeInput=document.getElementById('timeInput'),orthoSection=document.getElementById('orthoCheck'),dropsTimeline=document.getElementById('dropsTimeline'),examTimeEl=document.getElementById('examTime'),copyBtn=document.getElementById('copyBtn'),resetBtn=document.getElementById('resetBtn'),settingsBtn=document.getElementById('settingsBtn'),backBtn=document.getElementById('backBtn'),copyModal=document.getElementById('copyModal'),slideTrack=document.getElementById('slideTrack');
+
+    function goToPage(p){currentPage=p;slideTrack.style.transform=`translateX(-${p*50}%)`;}
+    function roundToNearest5(d){const m=d.getMinutes(),r=m%5;d.setMinutes(r>=2.5?m+(5-r):m-r);d.setSeconds(0);return d;}
+    function formatTime(d){return`${d.getHours().toString().padStart(2,'0')}h${d.getMinutes().toString().padStart(2,'0')}`;}
+    function getStartTime(){if(useNow)return roundToNearest5(new Date());const[h,m]=timeInput.value.split(':');const d=new Date();d.setHours(parseInt(h),parseInt(m),0,0);return roundToNearest5(d);}
+
+    function calculateProtocol(){
+      const startTime=getStartTime(),drops=parseInt(selectedDrops);
+      dropsTimeline.innerHTML='';
+      const d1=document.createElement('div');d1.className='drop-time';
+      d1.innerHTML=`<div class="drop-info"><div class="drop-hour">${formatTime(startTime)}</div><div class="drop-instruction">${orthoChecked?'1ère goutte mise par l\'orthoptiste':'1 goutte dans chaque œil'}</div></div>`;
+      dropsTimeline.appendChild(d1);
+      const t2=new Date(startTime);t2.setMinutes(t2.getMinutes()+5);
+      const d2=document.createElement('div');d2.className='drop-time';
+      d2.innerHTML=`<div class="drop-info"><div class="drop-hour">${formatTime(t2)}</div><div class="drop-instruction">1 goutte dans chaque œil</div></div>`;
+      dropsTimeline.appendChild(d2);
+      if(drops===3){const t3=new Date(startTime);t3.setMinutes(t3.getMinutes()+10);const d3=document.createElement('div');d3.className='drop-time';d3.innerHTML=`<div class="drop-info"><div class="drop-hour">${formatTime(t3)}</div><div class="drop-instruction">1 goutte dans chaque œil</div></div>`;dropsTimeline.appendChild(d3);}
+      const et=new Date(startTime);et.setMinutes(et.getMinutes()+45);examTimeEl.textContent=formatTime(roundToNearest5(et));
+    }
+
+    function copyToClipboard(){
+      const st=getStartTime(),et=new Date(st);et.setMinutes(et.getMinutes()+45);
+      const txt=`SKIA RDV ${formatTime(roundToNearest5(et))}`;
+      if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>{copyModal.classList.add('show');setTimeout(()=>copyModal.classList.remove('show'),1500);});}
+      else{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);copyModal.classList.add('show');setTimeout(()=>copyModal.classList.remove('show'),1500);}
+    }
+
+    choiceBtns.forEach(b=>b.addEventListener('click',function(){choiceBtns.forEach(x=>x.classList.remove('active'));this.classList.add('active');selectedDrops=parseInt(this.dataset.drops);calculateProtocol();}));
+    
+    nowBtn.addEventListener('click',function(){nowBtn.classList.add('active');customBtn.classList.remove('active');timeInput.disabled=true;useNow=true;const n=new Date();timeInput.value=`${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`;calculateProtocol();});
+    
+    customBtn.addEventListener('click',function(){customBtn.classList.add('active');nowBtn.classList.remove('active');timeInput.disabled=false;useNow=false;const n=new Date();timeInput.value=`${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`;calculateProtocol();});
+    
+    timeInput.addEventListener('change',()=>{if(!useNow)calculateProtocol();});
+    orthoSection.addEventListener('click',function(){orthoChecked=!orthoChecked;this.classList.toggle('checked');calculateProtocol();});
+    copyBtn.addEventListener('click',copyToClipboard);
+    
+    resetBtn.addEventListener('click',function(){selectedDrops=3;orthoChecked=true;useNow=true;choiceBtns.forEach(b=>b.classList.toggle('active',b.dataset.drops==='3'));nowBtn.classList.add('active');customBtn.classList.remove('active');timeInput.disabled=true;orthoSection.classList.add('checked');const n=new Date();timeInput.value=`${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`;calculateProtocol();});
+    
+    settingsBtn.addEventListener('click',()=>goToPage(1));
+    backBtn.addEventListener('click',()=>goToPage(0));
+
+    let touchStartX=0,touchEndX=0;
+    slideTrack.addEventListener('touchstart',(e)=>{touchStartX=e.changedTouches[0].screenX;},{passive:true});
+    slideTrack.addEventListener('touchend',(e)=>{touchEndX=e.changedTouches[0].screenX;if(touchEndX<touchStartX-50&&currentPage===0)goToPage(1);if(touchEndX>touchStartX+50&&currentPage===1)goToPage(0);},{passive:true});
+
+    const n=new Date();timeInput.value=`${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`;calculateProtocol();
+  })();
+  </script>
+</body>
+</html>
