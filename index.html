@@ -140,7 +140,7 @@
     function goToPage(p){currentPage=p;slideTrack.style.transform=`translateX(-${p*50}%)`;}
     function roundToNearest5(d){const m=d.getMinutes(),r=m%5;d.setMinutes(r>=2.5?m+(5-r):m-r);d.setSeconds(0);return d;}
     function formatTime(d){return`${d.getHours().toString().padStart(2,'0')}h${d.getMinutes().toString().padStart(2,'0')}`;}
-    function getStartTime(){if(useNow)return roundToNearest5(new Date());const[h,m]=timeInput.value.split(':');const d=new Date();d.setHours(parseInt(h),parseInt(m),0,0);return roundToNearest5(d);}
+    function getStartTime(){if(useNow){const d=new Date();d.setSeconds(0);return d;}const[h,m]=timeInput.value.split(':');const d=new Date();d.setHours(parseInt(h),parseInt(m),0,0);return d;}
 
     function calculateProtocol(){
       const startTime=getStartTime(),drops=parseInt(selectedDrops);
