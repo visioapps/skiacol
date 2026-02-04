@@ -158,7 +158,7 @@
 
     function copyToClipboard(){
       const st=getStartTime(),et=new Date(st);et.setMinutes(et.getMinutes()+45);
-      const txt=`SKIA RDV ${formatTime(roundToNearest5(et))}`;
+      const txt=`SKIA RA${formatTime(roundToNearest5(et))}`;
       if(navigator.clipboard){navigator.clipboard.writeText(txt).then(()=>{copyModal.classList.add('show');setTimeout(()=>copyModal.classList.remove('show'),1500);});}
       else{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);copyModal.classList.add('show');setTimeout(()=>copyModal.classList.remove('show'),1500);}
     }
